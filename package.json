@@ -1,0 +1,35 @@
+{
+  "name": "sentry-alert-deduplication",
+  "version": "1.0.0",
+  "description": "Alert fatigue reduction agent for SuperOps platform - Hackathon demo",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "demo": "node src/bulletproof-demo.js",
+    "hackathon": "node src/hackathon-demo.js",
+    "bulletproof": "node src/bulletproof-demo.js",
+    "integration": "node src/superops-integration-demo.js",
+    "judge-demo": "node src/superops-integration-demo.js --judge",
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.6.0",
+    "express": "^4.18.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": [
+    "superops",
+    "alerts",
+    "deduplication",
+    "hackathon"
+  ],
+  "author": "Hackathon Team",
+  "license": "MIT"
+}

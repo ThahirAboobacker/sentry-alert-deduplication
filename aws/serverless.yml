@@ -1,0 +1,236 @@
+# Sentry AWS Serverless Deployment
+# SuperHack 2025 - AWS Lambda + API Gateway + DynamoDB
+
+service: sentry-alert-deduplication
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  
+  environment:
+    SUPEROPS_MODE: ${env:SUPEROPS_MODE, 'DEMO'}
+    SUPEROPS_API_KEY: ${env:SUPEROPS_API_KEY, ''}
+    SUPEROPS_ORG_ID: ${env:SUPEROPS_ORG_ID, ''}
+    METRICS_TABLE: ${self:service}-metrics-${self:provider.stage}
+    ERRORS_TABLE: ${self:service}-errors-${self:provider.stage}
+    
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-metrics-${self:provider.stage}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-errors-${self:provider.stage}"
+        - Effect: Allow
+          Action:
+            - cloudwatch:PutMetricData
+          Resource: "*"
+
+functions:
+  webhookHandler:
+    handler: lambda/sentry-webhook-handler.handler
+    description: "Sentry Alert Deduplication Webhook Handler - SuperHack 2025"
+    events:
+      - http:
+          path: /webhook
+          method: post
+          cors: true
+      - http:
+          path: /webhook
+          method: get
+          cors: true
+    environment:
+      FUNCTION_NAME: sentry-webhook-handler
+      
+  demoHandler:
+    handler: lambda/sentry-demo-handler.handler
+    description: "Sentry Demo Handler for Judge Presentations"
+    events:
+      - http:
+          path: /demo
+          method: get
+          cors: true
+      - http:
+          path: /demo
+          method: post
+          cors: true
+    environment:
+      FUNCTION_NAME: sentry-demo-handler
+
+  metricsHandler:
+    handler: lambda/sentry-metrics-handler.handler
+    description: "Sentry Metrics and Status Handler"
+    events:
+      - http:
+          path: /metrics
+          method: get
+          cors: true
+      - http:
+          path: /status
+          method: get
+          cors: true
+    environment:
+      FUNCTION_NAME: sentry-metrics-handler
+
+resources:
+  Resources:
+    # DynamoDB Tables
+    SentryMetricsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-metrics-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: timestamp-index
+            KeySchema:
+              - AttributeName: timestamp
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        Tags:
+          - Key: Project
+            Value: Sentry
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Hackathon
+            Value: SuperHack2025
+            
+    SentryErrorsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-errors-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        Tags:
+          - Key: Project
+            Value: Sentry
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Hackathon
+            Value: SuperHack2025
+
+    # CloudWatch Dashboard
+    SentryDashboard:
+      Type: AWS::CloudWatch::Dashboard
+      Properties:
+        DashboardName: Sentry-AlertProcessing-${self:provider.stage}
+        DashboardBody: |
+          {
+            "widgets": [
+              {
+                "type": "metric",
+                "x": 0,
+                "y": 0,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "metrics": [
+                    [ "Sentry/AlertProcessing", "AlertsProcessed" ],
+                    [ ".", "AlertsEscalated" ],
+                    [ ".", "DuplicatesRemoved" ]
+                  ],
+                  "period": 300,
+                  "stat": "Sum",
+                  "region": "${self:provider.region}",
+                  "title": "Sentry Alert Processing"
+                }
+              },
+              {
+                "type": "metric",
+                "x": 12,
+                "y": 0,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "metrics": [
+                    [ "Sentry/AlertProcessing", "NoiseReduction" ]
+                  ],
+                  "period": 300,
+                  "stat": "Average",
+                  "region": "${self:provider.region}",
+                  "title": "Noise Reduction Percentage"
+                }
+              }
+            ]
+          }
+
+  Outputs:
+    WebhookUrl:
+      Description: "Sentry Webhook URL for SuperOps Integration"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/webhook"
+      Export:
+        Name: ${self:service}-webhook-url-${self:provider.stage}
+        
+    DemoUrl:
+      Description: "Sentry Demo URL for Judge Presentations"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/demo"
+      Export:
+        Name: ${self:service}-demo-url-${self:provider.stage}
+        
+    MetricsUrl:
+      Description: "Sentry Metrics URL"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/metrics"
+      Export:
+        Name: ${self:service}-metrics-url-${self:provider.stage}
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3001

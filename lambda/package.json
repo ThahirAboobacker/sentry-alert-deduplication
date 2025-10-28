@@ -1,0 +1,33 @@
+{
+  "name": "sentry-lambda",
+  "version": "1.0.0",
+  "description": "Sentry Alert Deduplication - AWS Lambda Functions",
+  "main": "sentry-webhook-handler.js",
+  "scripts": {
+    "test": "node test-lambda.js",
+    "deploy": "cd ../aws && serverless deploy",
+    "deploy-dev": "cd ../aws && serverless deploy --stage dev",
+    "deploy-prod": "cd ../aws && serverless deploy --stage prod",
+    "remove": "cd ../aws && serverless remove",
+    "logs": "cd ../aws && serverless logs -f webhookHandler -t",
+    "invoke": "cd ../aws && serverless invoke -f webhookHandler",
+    "offline": "cd ../aws && serverless offline"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "aws",
+    "lambda",
+    "serverless",
+    "superops",
+    "alert-deduplication",
+    "superhack-2025"
+  ],
+  "author": "Sentry Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
