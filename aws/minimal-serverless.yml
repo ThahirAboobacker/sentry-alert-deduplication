@@ -1,0 +1,16 @@
+service: sentry-demo
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: dev
+
+functions:
+  demo:
+    handler: ../lambda/sentry-demo-handler.handler
+    events:
+      - http:
+          path: demo
+          method: get
+          cors: true

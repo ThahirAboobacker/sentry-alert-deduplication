@@ -41,11 +41,11 @@ functions:
     description: "Sentry Alert Deduplication Webhook Handler - SuperHack 2025"
     events:
       - http:
-          path: /webhook
+          path: webhook
           method: post
           cors: true
       - http:
-          path: /webhook
+          path: webhook
           method: get
           cors: true
     environment:
@@ -56,11 +56,11 @@ functions:
     description: "Sentry Demo Handler for Judge Presentations"
     events:
       - http:
-          path: /demo
+          path: demo
           method: get
           cors: true
       - http:
-          path: /demo
+          path: demo
           method: post
           cors: true
     environment:
@@ -71,11 +71,11 @@ functions:
     description: "Sentry Metrics and Status Handler"
     events:
       - http:
-          path: /metrics
+          path: metrics
           method: get
           cors: true
       - http:
-          path: /status
+          path: status
           method: get
           cors: true
     environment:
@@ -228,9 +228,9 @@ resources:
       Export:
         Name: ${self:service}-metrics-url-${self:provider.stage}
 
-plugins:
-  - serverless-offline
+# plugins:
+#   - serverless-offline
 
-custom:
-  serverless-offline:
-    httpPort: 3001
+# custom:
+#   serverless-offline:
+#     httpPort: 3001

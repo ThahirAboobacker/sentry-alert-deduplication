@@ -1,0 +1,3966 @@
+{
+  "C:\\project\\aws\\serverless.yml": {
+    "versionFramework": "4.22.0",
+    "servicePath": "C:\\project\\aws\\serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "sentry-alert-deduplication",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs18.x",
+        "region": "us-east-1",
+        "stage": "dev",
+        "memorySize": 512,
+        "timeout": 30,
+        "environment": {
+          "SUPEROPS_MODE": "DEMO",
+          "SUPEROPS_API_KEY": "<REDACTED>",
+          "SUPEROPS_ORG_ID": "",
+          "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+          "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev"
+        },
+        "iam": {
+          "role": {
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:GetItem",
+                  "dynamodb:Query",
+                  "dynamodb:Scan"
+                ],
+                "Resource": [
+                  "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-metrics-dev",
+                  "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-errors-dev"
+                ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "cloudwatch:PutMetricData"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+        },
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "WebhookHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-webhookHandler"
+              }
+            },
+            "DemoHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-demoHandler"
+              }
+            },
+            "MetricsHandlerLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-metricsHandler"
+              }
+            },
+            "IamRoleLambdaExecution": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                "AssumeRolePolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": [
+                          "lambda.amazonaws.com"
+                        ]
+                      },
+                      "Action": [
+                        "sts:AssumeRole"
+                      ]
+                    }
+                  ]
+                },
+                "Policies": [
+                  {
+                    "PolicyName": {
+                      "Fn::Join": [
+                        "-",
+                        [
+                          "sentry-alert-deduplication",
+                          "dev",
+                          "lambda"
+                        ]
+                      ]
+                    },
+                    "PolicyDocument": {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "logs:TagResource"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:PutLogEvents"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "dynamodb:PutItem",
+                            "dynamodb:GetItem",
+                            "dynamodb:Query",
+                            "dynamodb:Scan"
+                          ],
+                          "Resource": [
+                            "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-metrics-dev",
+                            "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-errors-dev"
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "cloudwatch:PutMetricData"
+                          ],
+                          "Resource": "*"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "Path": "/",
+                "RoleName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "sentry-alert-deduplication",
+                      "dev",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "lambdaRole"
+                    ]
+                  ]
+                }
+              }
+            },
+            "WebhookHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                  "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+                },
+                "Handler": "lambda/sentry-webhook-handler.handler",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "sentry-alert-deduplication-dev-webhookHandler",
+                "MemorySize": 512,
+                "Timeout": 30,
+                "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025",
+                "Environment": {
+                  "Variables": {
+                    "SUPEROPS_MODE": "DEMO",
+                    "SUPEROPS_API_KEY": "<REDACTED>",
+                    "SUPEROPS_ORG_ID": "",
+                    "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                    "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                    "FUNCTION_NAME": "sentry-webhook-handler"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "WebhookHandlerLogGroup"
+              ]
+            },
+            "DemoHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                  "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+                },
+                "Handler": "lambda/sentry-demo-handler.handler",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "sentry-alert-deduplication-dev-demoHandler",
+                "MemorySize": 512,
+                "Timeout": 30,
+                "Description": "Sentry Demo Handler for Judge Presentations",
+                "Environment": {
+                  "Variables": {
+                    "SUPEROPS_MODE": "DEMO",
+                    "SUPEROPS_API_KEY": "<REDACTED>",
+                    "SUPEROPS_ORG_ID": "",
+                    "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                    "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                    "FUNCTION_NAME": "sentry-demo-handler"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "DemoHandlerLogGroup"
+              ]
+            },
+            "MetricsHandlerLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                  "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+                },
+                "Handler": "lambda/sentry-metrics-handler.handler",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "sentry-alert-deduplication-dev-metricsHandler",
+                "MemorySize": 512,
+                "Timeout": 30,
+                "Description": "Sentry Metrics and Status Handler",
+                "Environment": {
+                  "Variables": {
+                    "SUPEROPS_MODE": "DEMO",
+                    "SUPEROPS_API_KEY": "<REDACTED>",
+                    "SUPEROPS_ORG_ID": "",
+                    "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                    "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                    "FUNCTION_NAME": "sentry-metrics-handler"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "MetricsHandlerLogGroup"
+              ]
+            },
+            "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "WebhookHandlerLambdaFunction"
+                },
+                "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+                "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025"
+              }
+            },
+            "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "DemoHandlerLambdaFunction"
+                },
+                "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+                "Description": "Sentry Demo Handler for Judge Presentations"
+              }
+            },
+            "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "MetricsHandlerLambdaFunction"
+                },
+                "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+                "Description": "Sentry Metrics and Status Handler"
+              }
+            },
+            "ApiGatewayRestApi": {
+              "Type": "AWS::ApiGateway::RestApi",
+              "Properties": {
+                "Name": "dev-sentry-alert-deduplication",
+                "EndpointConfiguration": {
+                  "Types": [
+                    "EDGE"
+                  ]
+                },
+                "Policy": ""
+              }
+            },
+            "ApiGatewayResourceWebhook": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "webhook",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayResourceDemo": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "demo",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayResourceMetrics": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "metrics",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayResourceStatus": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "status",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodWebhookOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceWebhook"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodDemoOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST,GET'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceDemo"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodMetricsOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceMetrics"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodStatusOptions": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "OPTIONS",
+                "MethodResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": true,
+                      "method.response.header.Access-Control-Allow-Headers": true,
+                      "method.response.header.Access-Control-Allow-Methods": true
+                    },
+                    "ResponseModels": {}
+                  }
+                ],
+                "RequestParameters": {},
+                "Integration": {
+                  "Type": "MOCK",
+                  "RequestTemplates": {
+                    "application/json": "{statusCode:200}"
+                  },
+                  "ContentHandling": "CONVERT_TO_TEXT",
+                  "IntegrationResponses": [
+                    {
+                      "StatusCode": "200",
+                      "ResponseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                      },
+                      "ResponseTemplates": {
+                        "application/json": ""
+                      }
+                    }
+                  ]
+                },
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceStatus"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodWebhookPost": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "POST",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceWebhook"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "WebhookHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "WebhookHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodWebhookGet": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "GET",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceWebhook"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "WebhookHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "WebhookHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodDemoGet": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "GET",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceDemo"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "DemoHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "DemoHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodDemoPost": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "POST",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceDemo"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "DemoHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "DemoHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodMetricsGet": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "GET",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceMetrics"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "MetricsHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "MetricsHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodStatusGet": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "GET",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceStatus"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "MetricsHandlerLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "MetricsHandlerLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayDeployment1761680475181": {
+              "Type": "AWS::ApiGateway::Deployment",
+              "Properties": {
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "StageName": "dev"
+              },
+              "DependsOn": [
+                "ApiGatewayMethodWebhookOptions",
+                "ApiGatewayMethodDemoOptions",
+                "ApiGatewayMethodMetricsOptions",
+                "ApiGatewayMethodStatusOptions",
+                "ApiGatewayMethodWebhookPost",
+                "ApiGatewayMethodWebhookGet",
+                "ApiGatewayMethodDemoGet",
+                "ApiGatewayMethodDemoPost",
+                "ApiGatewayMethodMetricsGet",
+                "ApiGatewayMethodStatusGet"
+              ]
+            },
+            "WebhookHandlerLambdaPermissionApiGateway": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "WebhookHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "ApiGatewayRestApi"
+                      },
+                      "/*/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "DemoHandlerLambdaPermissionApiGateway": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "DemoHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "ApiGatewayRestApi"
+                      },
+                      "/*/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "MetricsHandlerLambdaPermissionApiGateway": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "MetricsHandlerLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "ApiGatewayRestApi"
+                      },
+                      "/*/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "SentryMetricsTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "sentry-alert-deduplication-metrics-dev",
+                "BillingMode": "PAY_PER_REQUEST",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "id",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "timestamp",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "id",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "GlobalSecondaryIndexes": [
+                  {
+                    "IndexName": "timestamp-index",
+                    "KeySchema": [
+                      {
+                        "AttributeName": "timestamp",
+                        "KeyType": "HASH"
+                      }
+                    ],
+                    "Projection": {
+                      "ProjectionType": "ALL"
+                    }
+                  }
+                ],
+                "TimeToLiveSpecification": {
+                  "AttributeName": "ttl",
+                  "Enabled": true
+                },
+                "Tags": [
+                  {
+                    "Key": "Project",
+                    "Value": "Sentry"
+                  },
+                  {
+                    "Key": "Environment",
+                    "Value": "dev"
+                  },
+                  {
+                    "Key": "Hackathon",
+                    "Value": "SuperHack2025"
+                  }
+                ]
+              }
+            },
+            "SentryErrorsTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "sentry-alert-deduplication-errors-dev",
+                "BillingMode": "PAY_PER_REQUEST",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "id",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "id",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "TimeToLiveSpecification": {
+                  "AttributeName": "ttl",
+                  "Enabled": true
+                },
+                "Tags": [
+                  {
+                    "Key": "Project",
+                    "Value": "Sentry"
+                  },
+                  {
+                    "Key": "Environment",
+                    "Value": "dev"
+                  },
+                  {
+                    "Key": "Hackathon",
+                    "Value": "SuperHack2025"
+                  }
+                ]
+              }
+            },
+            "SentryDashboard": {
+              "Type": "AWS::CloudWatch::Dashboard",
+              "Properties": {
+                "DashboardName": "Sentry-AlertProcessing-dev",
+                "DashboardBody": "{\n  \"widgets\": [\n    {\n      \"type\": \"metric\",\n      \"x\": 0,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"AlertsProcessed\" ],\n          [ \".\", \"AlertsEscalated\" ],\n          [ \".\", \"DuplicatesRemoved\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Sum\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Sentry Alert Processing\"\n      }\n    },\n    {\n      \"type\": \"metric\",\n      \"x\": 12,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"NoiseReduction\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Average\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Noise Reduction Percentage\"\n      }\n    }\n  ]\n}\n"
+              }
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+              "Export": {
+                "Name": "sls-sentry-alert-deduplication-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "WebhookHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c"
+              },
+              "Export": {
+                "Name": "sls-sentry-alert-deduplication-dev-WebhookHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "DemoHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg"
+              },
+              "Export": {
+                "Name": "sls-sentry-alert-deduplication-dev-DemoHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "MetricsHandlerLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI"
+              },
+              "Export": {
+                "Name": "sls-sentry-alert-deduplication-dev-MetricsHandlerLambdaFunctionQualifiedArn"
+              }
+            },
+            "ServiceEndpoint": {
+              "Description": "URL of the service endpoint",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    },
+                    "/dev"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-sentry-alert-deduplication-dev-ServiceEndpoint"
+              }
+            },
+            "WebhookUrl": {
+              "Description": "Sentry Webhook URL for SuperOps Integration",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    "us-east-1",
+                    ".amazonaws.com/",
+                    "dev",
+                    "/webhook"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sentry-alert-deduplication-webhook-url-dev"
+              }
+            },
+            "DemoUrl": {
+              "Description": "Sentry Demo URL for Judge Presentations",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    "us-east-1",
+                    ".amazonaws.com/",
+                    "dev",
+                    "/demo"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sentry-alert-deduplication-demo-url-dev"
+              }
+            },
+            "MetricsUrl": {
+              "Description": "Sentry Metrics URL",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    "us-east-1",
+                    ".amazonaws.com/",
+                    "dev",
+                    "/metrics"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sentry-alert-deduplication-metrics-url-dev"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "functions": {
+        "webhookHandler": {
+          "handler": "lambda/sentry-webhook-handler.handler",
+          "description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025",
+          "events": [
+            {
+              "http": {
+                "path": "webhook",
+                "method": "post",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "POST"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            },
+            {
+              "http": {
+                "path": "webhook",
+                "method": "get",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "GET"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            }
+          ],
+          "environment": {
+            "FUNCTION_NAME": "sentry-webhook-handler"
+          },
+          "name": "sentry-alert-deduplication-dev-webhookHandler",
+          "package": {},
+          "memory": 512,
+          "timeout": 30,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c"
+        },
+        "demoHandler": {
+          "handler": "lambda/sentry-demo-handler.handler",
+          "description": "Sentry Demo Handler for Judge Presentations",
+          "events": [
+            {
+              "http": {
+                "path": "demo",
+                "method": "get",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "GET"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            },
+            {
+              "http": {
+                "path": "demo",
+                "method": "post",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "POST"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            }
+          ],
+          "environment": {
+            "FUNCTION_NAME": "sentry-demo-handler"
+          },
+          "name": "sentry-alert-deduplication-dev-demoHandler",
+          "package": {},
+          "memory": 512,
+          "timeout": 30,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg"
+        },
+        "metricsHandler": {
+          "handler": "lambda/sentry-metrics-handler.handler",
+          "description": "Sentry Metrics and Status Handler",
+          "events": [
+            {
+              "http": {
+                "path": "metrics",
+                "method": "get",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "GET"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            },
+            {
+              "http": {
+                "path": "status",
+                "method": "get",
+                "cors": {
+                  "origin": "*",
+                  "methods": [
+                    "OPTIONS",
+                    "GET"
+                  ],
+                  "headers": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "allowCredentials": "<REDACTED>"
+                },
+                "integration": "AWS_PROXY"
+              }
+            }
+          ],
+          "environment": {
+            "FUNCTION_NAME": "sentry-metrics-handler"
+          },
+          "name": "sentry-alert-deduplication-dev-metricsHandler",
+          "package": {},
+          "memory": 512,
+          "timeout": 30,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI"
+        }
+      },
+      "resources": {
+        "Resources": {
+          "SentryMetricsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "sentry-alert-deduplication-metrics-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "timestamp",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "timestamp-index",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "timestamp",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "TimeToLiveSpecification": {
+                "AttributeName": "ttl",
+                "Enabled": true
+              },
+              "Tags": [
+                {
+                  "Key": "Project",
+                  "Value": "Sentry"
+                },
+                {
+                  "Key": "Environment",
+                  "Value": "dev"
+                },
+                {
+                  "Key": "Hackathon",
+                  "Value": "SuperHack2025"
+                }
+              ]
+            }
+          },
+          "SentryErrorsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "sentry-alert-deduplication-errors-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "TimeToLiveSpecification": {
+                "AttributeName": "ttl",
+                "Enabled": true
+              },
+              "Tags": [
+                {
+                  "Key": "Project",
+                  "Value": "Sentry"
+                },
+                {
+                  "Key": "Environment",
+                  "Value": "dev"
+                },
+                {
+                  "Key": "Hackathon",
+                  "Value": "SuperHack2025"
+                }
+              ]
+            }
+          },
+          "SentryDashboard": {
+            "Type": "AWS::CloudWatch::Dashboard",
+            "Properties": {
+              "DashboardName": "Sentry-AlertProcessing-dev",
+              "DashboardBody": "{\n  \"widgets\": [\n    {\n      \"type\": \"metric\",\n      \"x\": 0,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"AlertsProcessed\" ],\n          [ \".\", \"AlertsEscalated\" ],\n          [ \".\", \"DuplicatesRemoved\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Sum\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Sentry Alert Processing\"\n      }\n    },\n    {\n      \"type\": \"metric\",\n      \"x\": 12,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"NoiseReduction\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Average\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Noise Reduction Percentage\"\n      }\n    }\n  ]\n}\n"
+            }
+          }
+        },
+        "Outputs": {
+          "WebhookUrl": {
+            "Description": "Sentry Webhook URL for SuperOps Integration",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/webhook"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-webhook-url-dev"
+            }
+          },
+          "DemoUrl": {
+            "Description": "Sentry Demo URL for Judge Presentations",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/demo"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-demo-url-dev"
+            }
+          },
+          "MetricsUrl": {
+            "Description": "Sentry Metrics URL",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/metrics"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-metrics-url-dev"
+            }
+          }
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs18.x",
+      "region": "us-east-1",
+      "stage": "dev",
+      "memorySize": 512,
+      "timeout": 30,
+      "environment": {
+        "SUPEROPS_MODE": "DEMO",
+        "SUPEROPS_API_KEY": "<REDACTED>",
+        "SUPEROPS_ORG_ID": "",
+        "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+        "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev"
+      },
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan"
+              ],
+              "Resource": [
+                "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-metrics-dev",
+                "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-errors-dev"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "cloudwatch:PutMetricData"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      },
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "WebhookHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-webhookHandler"
+            }
+          },
+          "DemoHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-demoHandler"
+            }
+          },
+          "MetricsHandlerLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-metricsHandler"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "sentry-alert-deduplication",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:PutItem",
+                          "dynamodb:GetItem",
+                          "dynamodb:Query",
+                          "dynamodb:Scan"
+                        ],
+                        "Resource": [
+                          "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-metrics-dev",
+                          "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-errors-dev"
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "cloudwatch:PutMetricData"
+                        ],
+                        "Resource": "*"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "sentry-alert-deduplication",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "WebhookHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+              },
+              "Handler": "lambda/sentry-webhook-handler.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "sentry-alert-deduplication-dev-webhookHandler",
+              "MemorySize": 512,
+              "Timeout": 30,
+              "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025",
+              "Environment": {
+                "Variables": {
+                  "SUPEROPS_MODE": "DEMO",
+                  "SUPEROPS_API_KEY": "<REDACTED>",
+                  "SUPEROPS_ORG_ID": "",
+                  "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                  "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                  "FUNCTION_NAME": "sentry-webhook-handler"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "WebhookHandlerLogGroup"
+            ]
+          },
+          "DemoHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+              },
+              "Handler": "lambda/sentry-demo-handler.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "sentry-alert-deduplication-dev-demoHandler",
+              "MemorySize": 512,
+              "Timeout": 30,
+              "Description": "Sentry Demo Handler for Judge Presentations",
+              "Environment": {
+                "Variables": {
+                  "SUPEROPS_MODE": "DEMO",
+                  "SUPEROPS_API_KEY": "<REDACTED>",
+                  "SUPEROPS_ORG_ID": "",
+                  "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                  "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                  "FUNCTION_NAME": "sentry-demo-handler"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "DemoHandlerLogGroup"
+            ]
+          },
+          "MetricsHandlerLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+                "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+              },
+              "Handler": "lambda/sentry-metrics-handler.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "sentry-alert-deduplication-dev-metricsHandler",
+              "MemorySize": 512,
+              "Timeout": 30,
+              "Description": "Sentry Metrics and Status Handler",
+              "Environment": {
+                "Variables": {
+                  "SUPEROPS_MODE": "DEMO",
+                  "SUPEROPS_API_KEY": "<REDACTED>",
+                  "SUPEROPS_ORG_ID": "",
+                  "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                  "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                  "FUNCTION_NAME": "sentry-metrics-handler"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "MetricsHandlerLogGroup"
+            ]
+          },
+          "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WebhookHandlerLambdaFunction"
+              },
+              "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+              "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025"
+            }
+          },
+          "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "DemoHandlerLambdaFunction"
+              },
+              "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+              "Description": "Sentry Demo Handler for Judge Presentations"
+            }
+          },
+          "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "MetricsHandlerLambdaFunction"
+              },
+              "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+              "Description": "Sentry Metrics and Status Handler"
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-sentry-alert-deduplication",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceWebhook": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "webhook",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceDemo": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "demo",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceMetrics": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "metrics",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceStatus": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "status",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWebhookOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWebhook"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodDemoOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceDemo"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodMetricsOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceMetrics"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodStatusOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceStatus"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWebhookPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWebhook"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "WebhookHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "WebhookHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodWebhookGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWebhook"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "WebhookHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "WebhookHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodDemoGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceDemo"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "DemoHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "DemoHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodDemoPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceDemo"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "DemoHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "DemoHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodMetricsGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceMetrics"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "MetricsHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "MetricsHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodStatusGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceStatus"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "MetricsHandlerLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "MetricsHandlerLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1761680475181": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodWebhookOptions",
+              "ApiGatewayMethodDemoOptions",
+              "ApiGatewayMethodMetricsOptions",
+              "ApiGatewayMethodStatusOptions",
+              "ApiGatewayMethodWebhookPost",
+              "ApiGatewayMethodWebhookGet",
+              "ApiGatewayMethodDemoGet",
+              "ApiGatewayMethodDemoPost",
+              "ApiGatewayMethodMetricsGet",
+              "ApiGatewayMethodStatusGet"
+            ]
+          },
+          "WebhookHandlerLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "WebhookHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "DemoHandlerLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "DemoHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "MetricsHandlerLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "MetricsHandlerLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "SentryMetricsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "sentry-alert-deduplication-metrics-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "timestamp",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "timestamp-index",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "timestamp",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ],
+              "TimeToLiveSpecification": {
+                "AttributeName": "ttl",
+                "Enabled": true
+              },
+              "Tags": [
+                {
+                  "Key": "Project",
+                  "Value": "Sentry"
+                },
+                {
+                  "Key": "Environment",
+                  "Value": "dev"
+                },
+                {
+                  "Key": "Hackathon",
+                  "Value": "SuperHack2025"
+                }
+              ]
+            }
+          },
+          "SentryErrorsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "sentry-alert-deduplication-errors-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "TimeToLiveSpecification": {
+                "AttributeName": "ttl",
+                "Enabled": true
+              },
+              "Tags": [
+                {
+                  "Key": "Project",
+                  "Value": "Sentry"
+                },
+                {
+                  "Key": "Environment",
+                  "Value": "dev"
+                },
+                {
+                  "Key": "Hackathon",
+                  "Value": "SuperHack2025"
+                }
+              ]
+            }
+          },
+          "SentryDashboard": {
+            "Type": "AWS::CloudWatch::Dashboard",
+            "Properties": {
+              "DashboardName": "Sentry-AlertProcessing-dev",
+              "DashboardBody": "{\n  \"widgets\": [\n    {\n      \"type\": \"metric\",\n      \"x\": 0,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"AlertsProcessed\" ],\n          [ \".\", \"AlertsEscalated\" ],\n          [ \".\", \"DuplicatesRemoved\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Sum\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Sentry Alert Processing\"\n      }\n    },\n    {\n      \"type\": \"metric\",\n      \"x\": 12,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"NoiseReduction\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Average\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Noise Reduction Percentage\"\n      }\n    }\n  ]\n}\n"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+            "Export": {
+              "Name": "sls-sentry-alert-deduplication-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "WebhookHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c"
+            },
+            "Export": {
+              "Name": "sls-sentry-alert-deduplication-dev-WebhookHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "DemoHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg"
+            },
+            "Export": {
+              "Name": "sls-sentry-alert-deduplication-dev-DemoHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "MetricsHandlerLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI"
+            },
+            "Export": {
+              "Name": "sls-sentry-alert-deduplication-dev-MetricsHandlerLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-sentry-alert-deduplication-dev-ServiceEndpoint"
+            }
+          },
+          "WebhookUrl": {
+            "Description": "Sentry Webhook URL for SuperOps Integration",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/webhook"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-webhook-url-dev"
+            }
+          },
+          "DemoUrl": {
+            "Description": "Sentry Demo URL for Judge Presentations",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/demo"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-demo-url-dev"
+            }
+          },
+          "MetricsUrl": {
+            "Description": "Sentry Metrics URL",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  "us-east-1",
+                  ".amazonaws.com/",
+                  "dev",
+                  "/metrics"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sentry-alert-deduplication-metrics-url-dev"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "# Sentry AWS Serverless Deployment\r\n# SuperHack 2025 - AWS Lambda + API Gateway + DynamoDB\r\n\r\nservice: sentry-alert-deduplication\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: ${opt:region, 'us-east-1'}\r\n  stage: ${opt:stage, 'dev'}\r\n  memorySize: 512\r\n  timeout: 30\r\n  \r\n  environment:\r\n    SUPEROPS_MODE: ${env:SUPEROPS_MODE, 'DEMO'}\r\n    SUPEROPS_API_KEY: ${env:SUPEROPS_API_KEY, ''}\r\n    SUPEROPS_ORG_ID: ${env:SUPEROPS_ORG_ID, ''}\r\n    METRICS_TABLE: ${self:service}-metrics-${self:provider.stage}\r\n    ERRORS_TABLE: ${self:service}-errors-${self:provider.stage}\r\n    \r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:PutItem\r\n            - dynamodb:GetItem\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-metrics-${self:provider.stage}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-errors-${self:provider.stage}\"\r\n        - Effect: Allow\r\n          Action:\r\n            - cloudwatch:PutMetricData\r\n          Resource: \"*\"\r\n\r\nfunctions:\r\n  webhookHandler:\r\n    handler: lambda/sentry-webhook-handler.handler\r\n    description: \"Sentry Alert Deduplication Webhook Handler - SuperHack 2025\"\r\n    events:\r\n      - http:\r\n          path: /webhook\r\n          method: post\r\n          cors: true\r\n      - http:\r\n          path: /webhook\r\n          method: get\r\n          cors: true\r\n    environment:\r\n      FUNCTION_NAME: sentry-webhook-handler\r\n      \r\n  demoHandler:\r\n    handler: lambda/sentry-demo-handler.handler\r\n    description: \"Sentry Demo Handler for Judge Presentations\"\r\n    events:\r\n      - http:\r\n          path: /demo\r\n          method: get\r\n          cors: true\r\n      - http:\r\n          path: /demo\r\n          method: post\r\n          cors: true\r\n    environment:\r\n      FUNCTION_NAME: sentry-demo-handler\r\n\r\n  metricsHandler:\r\n    handler: lambda/sentry-metrics-handler.handler\r\n    description: \"Sentry Metrics and Status Handler\"\r\n    events:\r\n      - http:\r\n          path: /metrics\r\n          method: get\r\n          cors: true\r\n      - http:\r\n          path: /status\r\n          method: get\r\n          cors: true\r\n    environment:\r\n      FUNCTION_NAME: sentry-metrics-handler\r\n\r\nresources:\r\n  Resources:\r\n    # DynamoDB Tables\r\n    SentryMetricsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-metrics-${self:provider.stage}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n          - AttributeName: timestamp\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: timestamp-index\r\n            KeySchema:\r\n              - AttributeName: timestamp\r\n                KeyType: HASH\r\n            Projection:\r\n              ProjectionType: ALL\r\n        TimeToLiveSpecification:\r\n          AttributeName: ttl\r\n          Enabled: true\r\n        Tags:\r\n          - Key: Project\r\n            Value: Sentry\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Hackathon\r\n            Value: SuperHack2025\r\n            \r\n    SentryErrorsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-errors-${self:provider.stage}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        TimeToLiveSpecification:\r\n          AttributeName: ttl\r\n          Enabled: true\r\n        Tags:\r\n          - Key: Project\r\n            Value: Sentry\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Hackathon\r\n            Value: SuperHack2025\r\n\r\n    # CloudWatch Dashboard\r\n    SentryDashboard:\r\n      Type: AWS::CloudWatch::Dashboard\r\n      Properties:\r\n        DashboardName: Sentry-AlertProcessing-${self:provider.stage}\r\n        DashboardBody: |\r\n          {\r\n            \"widgets\": [\r\n              {\r\n                \"type\": \"metric\",\r\n                \"x\": 0,\r\n                \"y\": 0,\r\n                \"width\": 12,\r\n                \"height\": 6,\r\n                \"properties\": {\r\n                  \"metrics\": [\r\n                    [ \"Sentry/AlertProcessing\", \"AlertsProcessed\" ],\r\n                    [ \".\", \"AlertsEscalated\" ],\r\n                    [ \".\", \"DuplicatesRemoved\" ]\r\n                  ],\r\n                  \"period\": 300,\r\n                  \"stat\": \"Sum\",\r\n                  \"region\": \"${self:provider.region}\",\r\n                  \"title\": \"Sentry Alert Processing\"\r\n                }\r\n              },\r\n              {\r\n                \"type\": \"metric\",\r\n                \"x\": 12,\r\n                \"y\": 0,\r\n                \"width\": 12,\r\n                \"height\": 6,\r\n                \"properties\": {\r\n                  \"metrics\": [\r\n                    [ \"Sentry/AlertProcessing\", \"NoiseReduction\" ]\r\n                  ],\r\n                  \"period\": 300,\r\n                  \"stat\": \"Average\",\r\n                  \"region\": \"${self:provider.region}\",\r\n                  \"title\": \"Noise Reduction Percentage\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n\r\n  Outputs:\r\n    WebhookUrl:\r\n      Description: \"Sentry Webhook URL for SuperOps Integration\"\r\n      Value:\r\n        Fn::Join:\r\n          - \"\"\r\n          - - \"https://\"\r\n            - Ref: ApiGatewayRestApi\r\n            - \".execute-api.\"\r\n            - ${self:provider.region}\r\n            - \".amazonaws.com/\"\r\n            - ${self:provider.stage}\r\n            - \"/webhook\"\r\n      Export:\r\n        Name: ${self:service}-webhook-url-${self:provider.stage}\r\n        \r\n    DemoUrl:\r\n      Description: \"Sentry Demo URL for Judge Presentations\"\r\n      Value:\r\n        Fn::Join:\r\n          - \"\"\r\n          - - \"https://\"\r\n            - Ref: ApiGatewayRestApi\r\n            - \".execute-api.\"\r\n            - ${self:provider.region}\r\n            - \".amazonaws.com/\"\r\n            - ${self:provider.stage}\r\n            - \"/demo\"\r\n      Export:\r\n        Name: ${self:service}-demo-url-${self:provider.stage}\r\n        \r\n    MetricsUrl:\r\n      Description: \"Sentry Metrics URL\"\r\n      Value:\r\n        Fn::Join:\r\n          - \"\"\r\n          - - \"https://\"\r\n            - Ref: ApiGatewayRestApi\r\n            - \".execute-api.\"\r\n            - ${self:provider.region}\r\n            - \".amazonaws.com/\"\r\n            - ${self:provider.stage}\r\n            - \"/metrics\"\r\n      Export:\r\n        Name: ${self:service}-metrics-url-${self:provider.stage}\r\n\r\n# plugins:\r\n#   - serverless-offline\r\n\r\n# custom:\r\n#   serverless-offline:\r\n#     httpPort: 3001",
+    "command": [
+      "deploy"
+    ],
+    "options": {
+      "stage": "dev",
+      "region": "us-east-1"
+    },
+    "orgId": "8b99ab90-4c9e-4c90-b7e3-03876e26ceef",
+    "orgName": "effiteam",
+    "userId": "Xp31mCqpx73BPn6vYL",
+    "userName": "effiteam",
+    "serviceProviderAwsAccountId": "546747990279",
+    "serviceProviderAwsCfStackName": "sentry-alert-deduplication-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:546747990279:stack/sentry-alert-deduplication-dev/2b8efc30-b436-11f0-bc56-0e112fde109b",
+    "serviceProviderAwsCfStackCreated": "2025-10-28T19:42:00.232Z",
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "WebhookHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:546747990279:function:sentry-alert-deduplication-dev-webhookHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-sentry-alert-deduplication-dev-WebhookHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "WebhookUrl",
+        "OutputValue": "https://2s76k5m0v2.execute-api.us-east-1.amazonaws.com/dev/webhook",
+        "Description": "Sentry Webhook URL for SuperOps Integration",
+        "ExportName": "sentry-alert-deduplication-webhook-url-dev"
+      },
+      {
+        "OutputKey": "DemoHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:546747990279:function:sentry-alert-deduplication-dev-demoHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-sentry-alert-deduplication-dev-DemoHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "MetricsUrl",
+        "OutputValue": "https://2s76k5m0v2.execute-api.us-east-1.amazonaws.com/dev/metrics",
+        "Description": "Sentry Metrics URL",
+        "ExportName": "sentry-alert-deduplication-metrics-url-dev"
+      },
+      {
+        "OutputKey": "DemoUrl",
+        "OutputValue": "https://2s76k5m0v2.execute-api.us-east-1.amazonaws.com/dev/demo",
+        "Description": "Sentry Demo URL for Judge Presentations",
+        "ExportName": "sentry-alert-deduplication-demo-url-dev"
+      },
+      {
+        "OutputKey": "MetricsHandlerLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:546747990279:function:sentry-alert-deduplication-dev-metricsHandler:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-sentry-alert-deduplication-dev-MetricsHandlerLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://2s76k5m0v2.execute-api.us-east-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-sentry-alert-deduplication-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+        "ExportName": "sls-sentry-alert-deduplication-dev-ServerlessDeploymentBucketName"
+      }
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "WebhookHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-webhookHandler"
+          }
+        },
+        "DemoHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-demoHandler"
+          }
+        },
+        "MetricsHandlerLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/sentry-alert-deduplication-dev-metricsHandler"
+          }
+        },
+        "IamRoleLambdaExecution": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Policies": [
+              {
+                "PolicyName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "sentry-alert-deduplication",
+                      "dev",
+                      "lambda"
+                    ]
+                  ]
+                },
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:CreateLogStream",
+                        "logs:CreateLogGroup",
+                        "logs:TagResource"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sentry-alert-deduplication-dev*:*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:PutItem",
+                        "dynamodb:GetItem",
+                        "dynamodb:Query",
+                        "dynamodb:Scan"
+                      ],
+                      "Resource": [
+                        "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-metrics-dev",
+                        "arn:aws:dynamodb:us-east-1:*:table/sentry-alert-deduplication-errors-dev"
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "cloudwatch:PutMetricData"
+                      ],
+                      "Resource": "*"
+                    }
+                  ]
+                }
+              }
+            ],
+            "Path": "/",
+            "RoleName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "sentry-alert-deduplication",
+                  "dev",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "lambdaRole"
+                ]
+              ]
+            }
+          }
+        },
+        "WebhookHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+              "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+            },
+            "Handler": "lambda/sentry-webhook-handler.handler",
+            "Runtime": "nodejs18.x",
+            "FunctionName": "sentry-alert-deduplication-dev-webhookHandler",
+            "MemorySize": 512,
+            "Timeout": 30,
+            "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025",
+            "Environment": {
+              "Variables": {
+                "SUPEROPS_MODE": "DEMO",
+                "SUPEROPS_API_KEY": "<REDACTED>",
+                "SUPEROPS_ORG_ID": "",
+                "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                "FUNCTION_NAME": "sentry-webhook-handler"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "WebhookHandlerLogGroup"
+          ]
+        },
+        "DemoHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+              "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+            },
+            "Handler": "lambda/sentry-demo-handler.handler",
+            "Runtime": "nodejs18.x",
+            "FunctionName": "sentry-alert-deduplication-dev-demoHandler",
+            "MemorySize": 512,
+            "Timeout": 30,
+            "Description": "Sentry Demo Handler for Judge Presentations",
+            "Environment": {
+              "Variables": {
+                "SUPEROPS_MODE": "DEMO",
+                "SUPEROPS_API_KEY": "<REDACTED>",
+                "SUPEROPS_ORG_ID": "",
+                "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                "FUNCTION_NAME": "sentry-demo-handler"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "DemoHandlerLogGroup"
+          ]
+        },
+        "MetricsHandlerLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+              "S3Key": "serverless/sentry-alert-deduplication/dev/1761680489560-2025-10-28T19:41:29.560Z/sentry-alert-deduplication.zip"
+            },
+            "Handler": "lambda/sentry-metrics-handler.handler",
+            "Runtime": "nodejs18.x",
+            "FunctionName": "sentry-alert-deduplication-dev-metricsHandler",
+            "MemorySize": 512,
+            "Timeout": 30,
+            "Description": "Sentry Metrics and Status Handler",
+            "Environment": {
+              "Variables": {
+                "SUPEROPS_MODE": "DEMO",
+                "SUPEROPS_API_KEY": "<REDACTED>",
+                "SUPEROPS_ORG_ID": "",
+                "METRICS_TABLE": "sentry-alert-deduplication-metrics-dev",
+                "ERRORS_TABLE": "sentry-alert-deduplication-errors-dev",
+                "FUNCTION_NAME": "sentry-metrics-handler"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "MetricsHandlerLogGroup"
+          ]
+        },
+        "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "WebhookHandlerLambdaFunction"
+            },
+            "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+            "Description": "Sentry Alert Deduplication Webhook Handler - SuperHack 2025"
+          }
+        },
+        "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "DemoHandlerLambdaFunction"
+            },
+            "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+            "Description": "Sentry Demo Handler for Judge Presentations"
+          }
+        },
+        "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "MetricsHandlerLambdaFunction"
+            },
+            "CodeSha256": "jm1zk3XYz8Qa4ZP836DxmdIMGNKc6oy6lB6j+scTfLk=",
+            "Description": "Sentry Metrics and Status Handler"
+          }
+        },
+        "ApiGatewayRestApi": {
+          "Type": "AWS::ApiGateway::RestApi",
+          "Properties": {
+            "Name": "dev-sentry-alert-deduplication",
+            "EndpointConfiguration": {
+              "Types": [
+                "EDGE"
+              ]
+            },
+            "Policy": ""
+          }
+        },
+        "ApiGatewayResourceWebhook": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "webhook",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayResourceDemo": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "demo",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayResourceMetrics": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "metrics",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayResourceStatus": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "status",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodWebhookOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceWebhook"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodDemoOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST,GET'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceDemo"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodMetricsOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceMetrics"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodStatusOptions": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "AuthorizationType": "NONE",
+            "HttpMethod": "OPTIONS",
+            "MethodResponses": [
+              {
+                "StatusCode": "200",
+                "ResponseParameters": {
+                  "method.response.header.Access-Control-Allow-Origin": true,
+                  "method.response.header.Access-Control-Allow-Headers": true,
+                  "method.response.header.Access-Control-Allow-Methods": true
+                },
+                "ResponseModels": {}
+              }
+            ],
+            "RequestParameters": {},
+            "Integration": {
+              "Type": "MOCK",
+              "RequestTemplates": {
+                "application/json": "{statusCode:200}"
+              },
+              "ContentHandling": "CONVERT_TO_TEXT",
+              "IntegrationResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                  },
+                  "ResponseTemplates": {
+                    "application/json": ""
+                  }
+                }
+              ]
+            },
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceStatus"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodWebhookPost": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "POST",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceWebhook"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "WebhookHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "WebhookHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodWebhookGet": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "GET",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceWebhook"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "WebhookHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "WebhookHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodDemoGet": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "GET",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceDemo"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "DemoHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "DemoHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodDemoPost": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "POST",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceDemo"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "DemoHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "DemoHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodMetricsGet": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "GET",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceMetrics"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "MetricsHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "MetricsHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodStatusGet": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "GET",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceStatus"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "MetricsHandlerLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "MetricsHandlerLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayDeployment1761680475181": {
+          "Type": "AWS::ApiGateway::Deployment",
+          "Properties": {
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StageName": "dev"
+          },
+          "DependsOn": [
+            "ApiGatewayMethodWebhookOptions",
+            "ApiGatewayMethodDemoOptions",
+            "ApiGatewayMethodMetricsOptions",
+            "ApiGatewayMethodStatusOptions",
+            "ApiGatewayMethodWebhookPost",
+            "ApiGatewayMethodWebhookGet",
+            "ApiGatewayMethodDemoGet",
+            "ApiGatewayMethodDemoPost",
+            "ApiGatewayMethodMetricsGet",
+            "ApiGatewayMethodStatusGet"
+          ]
+        },
+        "WebhookHandlerLambdaPermissionApiGateway": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "WebhookHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  "/*/*"
+                ]
+              ]
+            }
+          }
+        },
+        "DemoHandlerLambdaPermissionApiGateway": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "DemoHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  "/*/*"
+                ]
+              ]
+            }
+          }
+        },
+        "MetricsHandlerLambdaPermissionApiGateway": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "MetricsHandlerLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  "/*/*"
+                ]
+              ]
+            }
+          }
+        },
+        "SentryMetricsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "sentry-alert-deduplication-metrics-dev",
+            "BillingMode": "PAY_PER_REQUEST",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "timestamp",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "timestamp-index",
+                "KeySchema": [
+                  {
+                    "AttributeName": "timestamp",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ],
+            "TimeToLiveSpecification": {
+              "AttributeName": "ttl",
+              "Enabled": true
+            },
+            "Tags": [
+              {
+                "Key": "Project",
+                "Value": "Sentry"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "Hackathon",
+                "Value": "SuperHack2025"
+              }
+            ]
+          }
+        },
+        "SentryErrorsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "sentry-alert-deduplication-errors-dev",
+            "BillingMode": "PAY_PER_REQUEST",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "TimeToLiveSpecification": {
+              "AttributeName": "ttl",
+              "Enabled": true
+            },
+            "Tags": [
+              {
+                "Key": "Project",
+                "Value": "Sentry"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "Hackathon",
+                "Value": "SuperHack2025"
+              }
+            ]
+          }
+        },
+        "SentryDashboard": {
+          "Type": "AWS::CloudWatch::Dashboard",
+          "Properties": {
+            "DashboardName": "Sentry-AlertProcessing-dev",
+            "DashboardBody": "{\n  \"widgets\": [\n    {\n      \"type\": \"metric\",\n      \"x\": 0,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"AlertsProcessed\" ],\n          [ \".\", \"AlertsEscalated\" ],\n          [ \".\", \"DuplicatesRemoved\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Sum\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Sentry Alert Processing\"\n      }\n    },\n    {\n      \"type\": \"metric\",\n      \"x\": 12,\n      \"y\": 0,\n      \"width\": 12,\n      \"height\": 6,\n      \"properties\": {\n        \"metrics\": [\n          [ \"Sentry/AlertProcessing\", \"NoiseReduction\" ]\n        ],\n        \"period\": 300,\n        \"stat\": \"Average\",\n        \"region\": \"us-east-1\",\n        \"title\": \"Noise Reduction Percentage\"\n      }\n    }\n  ]\n}\n"
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-us-east-1-27d2a445-ad71",
+          "Export": {
+            "Name": "sls-sentry-alert-deduplication-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "WebhookHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "WebhookHandlerLambdaVersionm6t6o8ySgCTmL7bgMmOslu88IDa6nX3U5tbCY6c"
+          },
+          "Export": {
+            "Name": "sls-sentry-alert-deduplication-dev-WebhookHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "DemoHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "DemoHandlerLambdaVersionosbs8CDHRhYFgaFlfIrd7CqcO1mlg02L98TI5Nxexg"
+          },
+          "Export": {
+            "Name": "sls-sentry-alert-deduplication-dev-DemoHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "MetricsHandlerLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "MetricsHandlerLambdaVersionZ4Ilbf3Hq8ULUn0p6yTN76GcfCvdNJPk2O1MBoisTI"
+          },
+          "Export": {
+            "Name": "sls-sentry-alert-deduplication-dev-MetricsHandlerLambdaFunctionQualifiedArn"
+          }
+        },
+        "ServiceEndpoint": {
+          "Description": "URL of the service endpoint",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                },
+                "/dev"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-sentry-alert-deduplication-dev-ServiceEndpoint"
+          }
+        },
+        "WebhookUrl": {
+          "Description": "Sentry Webhook URL for SuperOps Integration",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                "us-east-1",
+                ".amazonaws.com/",
+                "dev",
+                "/webhook"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sentry-alert-deduplication-webhook-url-dev"
+          }
+        },
+        "DemoUrl": {
+          "Description": "Sentry Demo URL for Judge Presentations",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                "us-east-1",
+                ".amazonaws.com/",
+                "dev",
+                "/demo"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sentry-alert-deduplication-demo-url-dev"
+          }
+        },
+        "MetricsUrl": {
+          "Description": "Sentry Metrics URL",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                "us-east-1",
+                ".amazonaws.com/",
+                "dev",
+                "/metrics"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sentry-alert-deduplication-metrics-url-dev"
+          }
+        }
+      }
+    }
+  }
+}
