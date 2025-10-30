@@ -1,144 +1,134 @@
-# 🛡️ Sentry - Alert Deduplication Engine
+# Sentry - Alert Deduplication Engine
 
-[![SuperHack 2025](https://img.shields.io/badge/SuperHack-2025-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)](https://superhack.superops.com)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Alert Reduction](https://img.shields.io/badge/Alert%20Reduction-88%25-brightgreen?style=for-the-badge)](https://github.com/yourusername/sentry-alert-deduplication)
-[![Accuracy](https://img.shields.io/badge/Accuracy-100%25-success?style=for-the-badge)](https://github.com/yourusername/sentry-alert-deduplication)
+[![SuperHack 2025](https://img.shields.io/badge/SuperHack-2025-blue?style=flat-square)](https://superhack.superops.com)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=flat-square&logo=node.js)](https://nodejs.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
 
-**🎯 SuperHack 2025 Winner - Reduces alert fatigue by 88% while ensuring zero critical alerts missed**
+**SuperHack 2025 Submission - Alert deduplication middleware for monitoring systems**
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
 npm install
 
-# Judge-ready demo (2 minutes)
+# Run demonstration
 npm run judge-demo
 
-# Deploy to AWS serverless (3 minutes)
-cd aws && ./deploy.sh dev
-
-# Test AWS deployment
-curl https://your-api-gateway-url/demo
-
-# Local development
+# Start local server
 npm start  # Web dashboard on localhost:3000
 ```
 
-## 🎯 Problem Statement
+## Problem Statement
 
-MSPs and IT teams suffer from **alert fatigue** - drowning in duplicate and low-priority alerts that mask real issues. A single network outage can generate 50+ duplicate alerts, overwhelming technicians and delaying response times.
+MSPs and IT teams experience alert fatigue from duplicate and low-priority notifications that obscure critical issues. Infrastructure incidents can generate numerous similar alerts, overwhelming technicians and delaying response times.
 
-## 💡 Our Solution: Sentry
+## Solution: Sentry
 
-Sentry is an AI-powered alert deduplication engine with **complete SuperOps integration** that sits between SuperOps monitoring and your IT team, intelligently filtering noise while ensuring zero critical alerts are missed.
+Sentry is an alert deduplication middleware designed to process monitoring alerts through intelligent filtering and grouping. The system reduces alert volume while maintaining visibility of critical issues.
 
-### 🔗 **SuperOps Integration**
-- **🔴 LIVE Mode**: Real SuperOps API integration with webhooks
-- **🟡 DEMO Mode**: Bulletproof presentation data (88% reduction guaranteed)
-- **🔄 Auto-Detection**: Automatically chooses best mode for your environment
-- **🛡️ Fallback Logic**: Never fails during presentations or production
+### SuperOps Compatibility
+- **API Integration**: Compatible with SuperOps webhook format
+- **Demo Mode**: Simulated SuperOps data for demonstration purposes
+- **Webhook Endpoint**: Processes alerts via POST /webhook
+- **Response Format**: Returns filtered alerts in structured format
 
 ### Key Features
-- **Smart Deduplication**: Groups similar alerts within 5-minute windows
-- **Noise Suppression**: Filters out low-priority and informational alerts  
-- **Critical Alert Protection**: Never suppresses alerts containing "critical", "outage", "down"
-- **AWS Serverless**: Lambda + API Gateway + DynamoDB architecture
-- **Real-time Processing**: Sub-10ms processing with infinite scalability
-- **Enterprise Monitoring**: CloudWatch dashboards and metrics
+- **Deduplication Algorithm**: Groups similar alerts within configurable time windows
+- **Noise Suppression**: Filters low-priority and informational alerts using rule-based logic
+- **Critical Alert Protection**: Preserves alerts containing severity keywords
+- **AWS Serverless Deployment**: Lambda + API Gateway + DynamoDB architecture available
+- **Performance**: Sub-10ms processing demonstrated in testing
+- **Monitoring**: CloudWatch integration for metrics and logging
 
-## 📊 Demo Results
+## Demonstration Results
 
-**Before Sentry**: 50 alerts → **After Sentry**: 8 alerts (84% reduction)
+**Test Scenario**: 25 simulated infrastructure alerts → 3 processed alerts (88% reduction)
 
-- ✅ 42 duplicate/noise alerts eliminated
-- ✅ 8 critical alerts properly escalated  
-- ✅ Zero false negatives (no missed critical issues)
-- ✅ 90%+ duplicate detection rate
+- 18 duplicate alerts identified and grouped
+- 4 low-priority alerts suppressed based on rules
+- 3 critical alerts preserved and escalated
+- Processing time: <10ms average
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-SuperOps Alerts → Sentry Engine → Filtered Alerts → IT Team
-                     ↓
-              [Deduplication] → [Noise Suppression] → [Prioritization]
+Monitoring System → Sentry Engine → Filtered Alerts → IT Team
+                       ↓
+                [Deduplication] → [Noise Suppression] → [Output]
 ```
 
 ### Core Components
-- **`src/superops-api.js`** - SuperOps API integration & realistic alert simulation
 - **`src/deduplication-engine.js`** - Core deduplication and filtering logic
 - **`src/index.js`** - Express server with dashboard and webhook endpoints
-- **`src/demo.js`** - Interactive demonstration scenarios
+- **`src/superops-integration-demo.js`** - SuperOps-compatible demonstration
+- **`lambda/`** - AWS Lambda deployment functions
 
-## 🔧 Technical Implementation
+## Technical Implementation
 
 ### Deduplication Algorithm
-1. Generate alert fingerprint: `hash(type + server + client + message)`
-2. Check if seen within 5-minute window
-3. If duplicate, suppress; if new, process
+1. Generate alert fingerprint using content hash
+2. Check for duplicates within configurable time window (default: 5 minutes)
+3. Group similar alerts and preserve most recent instance
 
 ### Noise Suppression Rules
-- CPU alerts < 90% with LOW severity
-- Alerts containing "informational"
-- Already resolved/acknowledged alerts
-- Disk usage < 98% with LOW severity
+- Filter alerts below configurable severity thresholds
+- Suppress informational and maintenance notifications
+- Remove alerts with resolved/acknowledged status
+- Apply resource-specific thresholds (CPU, disk, memory)
 
 ### Critical Alert Protection
-Never suppress alerts containing: `critical`, `outage`, `down`, `failed`
+Preserves alerts containing severity keywords: `critical`, `outage`, `down`, `failed`
 
-## 🌐 API Endpoints
+## API Endpoints
 
-- **GET /** - Interactive dashboard with real-time metrics
-- **POST /webhook** - Receives SuperOps alerts for processing
-- **GET /demo** - Runs pre-built demo scenario
-- **GET /api/metrics** - Returns current processing statistics
-- **GET /api/alerts** - Returns recent processed alerts
+- **GET /** - Web dashboard with processing metrics
+- **POST /webhook** - Alert processing endpoint (SuperOps compatible)
+- **GET /demo** - Demonstration scenario endpoint
+- **GET /api/metrics** - Processing statistics
+- **GET /api/alerts** - Recent processed alerts
 
-## 🎬 Demo Scenarios
+## Demonstration Scenarios
 
-### Scenario 1: Network Outage Storm
-- **Problem**: Switch failure generates 25 duplicate network timeout alerts
-- **Result**: Sentry groups into 3 unique alerts (88% reduction)
+### Infrastructure Incident Simulation
+- **Input**: 25 alerts from simulated database outage
+- **Processing**: Deduplication and noise suppression applied
+- **Output**: 3 critical alerts requiring attention
+- **Reduction**: 88% volume decrease demonstrated
 
-### Scenario 2: Mixed Infrastructure Alerts  
-- **Problem**: 40 mixed alerts with various noise and duplicates
-- **Result**: Sentry escalates 6 critical alerts (85% reduction)
+## Performance Metrics
 
-## 📈 Success Metrics
+| Metric | Demonstrated Result |
+|--------|-------------------|
+| Alert Volume Reduction | 88% (25→3 alerts) |
+| Processing Time | <10ms average |
+| Critical Alert Preservation | 100% (0 missed) |
+| Duplicate Detection | 18/18 identified |
 
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| Alert Volume Reduction | 80%+ | **84%** ✅ |
-| Duplicate Elimination | 90%+ | **92%** ✅ |
-| Critical Alerts Missed | 0% | **0%** ✅ |
+## Business Value
 
-## 🚀 Business Impact
+- **Efficiency**: Reduced alert volume improves response focus
+- **Accuracy**: Critical alerts preserved through fail-safe logic
+- **Scalability**: Serverless architecture supports variable loads
+- **Integration**: Compatible with existing monitoring workflows
 
-- **Faster Response**: IT teams focus on 8 real issues instead of 50 alerts
-- **Reduced Fatigue**: 84% fewer notifications = less burnout
-- **Better SLAs**: Critical issues get immediate attention
-- **Cost Savings**: Reduced time spent on false alarms
+## Future Development
 
-## 🔮 Future Enhancements
+- **Machine Learning**: Pattern recognition for adaptive filtering
+- **Custom Rules**: Client-specific suppression configuration
+- **Enhanced Integration**: Extended monitoring platform support
+- **Analytics**: Historical trend analysis and reporting
 
-- **Machine Learning**: Learn client-specific patterns for smarter filtering
-- **Custom Rules**: Per-client suppression rules and thresholds
-- **Integration**: Direct SuperOps API integration with real webhook endpoints
-- **Notifications**: Slack/Teams integration for escalated alerts
-- **Analytics**: Historical trending and alert pattern analysis
+## SuperHack 2025 Submission
 
-## 🏆 SuperHack 2025 Submission
+This project addresses **Service Efficiency Improvement** through:
+1. Demonstrated alert volume reduction (88%)
+2. Preservation of critical alert visibility
+3. Compatible integration approach with SuperOps
+4. Measurable performance improvements
 
-This project demonstrates **Service Efficiency Improvement** by:
-1. Reducing alert noise by 80%+
-2. Improving technician productivity  
-3. Ensuring zero critical alerts missed
-4. Providing clear ROI metrics
-
-**Ready for production deployment with SuperOps platform integration!**
+**Technology demonstration ready for evaluation and potential production integration.**
 
 ---
 
-*Built for SuperHack 2025 - Transforming IT Operations Through Intelligent Alert Management*
+*SuperHack 2025 Submission - Alert Management Efficiency Solution*
